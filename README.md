@@ -1,2 +1,2 @@
 # bAIzness
-minior project
+kush ki mkc
