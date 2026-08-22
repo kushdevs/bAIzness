@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bAIzness Workspace</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50: '#f0f3ff',
+                            dark: '#0b0f19',
+                            surface: '#111726',
+                            border: 'rgba(255, 255, 255, 0.08)'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-[#0b0f19] text-slate-100 font-sans antialiased h-screen overflow-hidden">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-[100] space-y-3 pointer-events-none"></div>
+
+    <div class="flex h-full w-full">
+        <!-- Sidebar Navigation (Hidden on Auth/Onboarding pages dynamically via JS) -->
+        <aside id="app-sidebar" class="w-64 border-r border-white/10 bg-[#0e1422] flex flex-col justify-between shrink-0 transition-all duration-300">
+            <div class="p-5 space-y-6">
+                <!-- App Logo -->
+                <a href="/index.html" class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-600 p-[1px]">
+                        <div class="w-full h-full bg-slate-950 rounded-[7px] flex items-center justify-center">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-indigo-400"></i>
+                        </div>
+                    </div>
+                    <span class="text-xl font-extrabold tracking-tight">b<span class="text-indigo-400">AI</span>zness</span>
+                </a>
+
+                <!-- Navigation Links -->
+                <nav class="space-y-1">
+                    <button onclick="navigateTo('dashboard')" class="nav-item active w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-300 hover:bg-white/5 transition-all">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                    </button>
+                    <button onclick="navigateTo('suggestions')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-300 hover:bg-white/5 transition-all">
+                        <i data-lucide="lightbulb" class="w-4 h-4 text-yellow-400"></i> AI Suggestions
+                    </button>
+                    <button onclick="navigateTo('business-plan')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-300 hover:bg-white/5 transition-all">
+                        <i data-lucide="file-text" class="w-4 h-4 text-indigo-400"></i> Business Plan
+                    </button>
+                    <button onclick="navigateTo('market')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-300 hover:bg-white/5 transition-all">
+                        <i data-lucide="line-chart" class="w-4 h-4 text-emerald-400"></i> Market Analysis
+                    </button>
+                    <button onclick="navigateTo('settings')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-300 hover:bg-white/5 transition-all">
+                        <i data-lucide="settings" class="w-4 h-4"></i> Settings
+                    </button>
+                </nav>
+            </div>
+
+            <div class="p-4 border-t border-white/5 space-y-3">
+                <button onclick="navigateTo('onboarding')" class="w-full py-2 px-3 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 text-indigo-300 text-xs font-bold flex items-center justify-center gap-2 transition-all">
+                    <i data-lucide="plus" class="w-4 h-4"></i> New Idea Analysis
+                </button>
+                <div class="flex items-center gap-3 px-2">
+                    <div class="w-8 h-8 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-300 font-bold text-xs">
+                        JS
+                    </div>
+                    <div class="truncate">
+                        <p class="text-xs font-bold text-slate-200 truncate">John Smith</p>
+                        <p class="text-[10px] text-slate-500 truncate">Founder Tier</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Viewport Area -->
+        <main class="flex-1 flex flex-col h-full bg-[#0b0f19] overflow-y-auto">
+            <!-- Topbar Header -->
+            <header id="app-header" class="h-16 border-b border-white/10 px-8 flex items-center justify-between shrink-0 bg-[#0d121f]/50 backdrop-blur-md">
+                <div class="flex items-center gap-4">
+                    <h2 id="page-title" class="text-lg font-bold text-white">Dashboard</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleTheme()" class="p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300">
+                        <i data-lucide="sun" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="showToast('Notifications synchronized', 'info')" class="p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 relative">
+                        <i data-lucide="bell" class="w-4 h-4"></i>
+                        <span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-indigo-500"></span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dynamic Views Container -->
+            <div id="views-container" class="p-8 max-w-7xl w-full mx-auto space-y-8">
+
+                <!-- VIEW 1: DASHBOARD -->
+                <section id="view-dashboard" class="app-view space-y-8">
+                    <!-- Welcome Hero -->
+                    <div class="p-6 rounded-2xl bg-gradient-to-r from-indigo-900/40 via-purple-900/20 to-slate-900 border border-indigo-500/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div>
+                            <h1 class="text-2xl font-extrabold">Good morning, Entrepreneur 👋</h1>
+                            <p class="text-sm text-slate-400 mt-1">Active Concept: <span class="text-indigo-400 font-semibold" id="active-business-name">EcoPack Solutions</span></p>
+                        </div>
+                        <button onclick="navigateTo('onboarding')" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold transition-all shadow-lg shadow-indigo-600/30">
+                            Re-analyze Concept
+                        </button>
+                    </div>
+
+                    <!-- Metric Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="p-5 rounded-xl bg-[#111726] border border-white/10 space-y-3">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Viability Score</span>
+                            <div class="flex items-baseline justify-between">
+                                <span class="text-3xl font-extrabold text-emerald-400" id="dash-score">82/100</span>
+                                <span class="text-xs text-emerald-500 font-semibold">Top 15%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                <div class="bg-emerald-400 h-full w-[82%]"></div>
+                            </div>
+                        </div>
+                        <div class="p-5 rounded-xl bg-[#111726] border border-white/10 space-y-3">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Market Potential</span>
+                            <div class="text-3xl font-extrabold text-indigo-400">High</div>
+                            <span class="text-xs text-slate-500">TAM: $12.4B Global</span>
+                        </div>
+                        <div class="p-5 rounded-xl bg-[#111726] border border-white/10 space-y-3">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Competition</span>
+                            <div class="text-3xl font-extrabold text-yellow-400">Moderate</div>
+                            <span class="text-xs text-slate-500">3 Dominant Players</span>
+                        </div>
+                        <div class="p-5 rounded-xl bg-[#111726] border border-white/10 space-y-3">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Growth Index</span>
+                            <div class="text-3xl font-extrabold text-purple-400"> Very High</div>
+                            <span class="text-xs text-slate-500">18.4% YoY Industry Growth</span>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-6 rounded-xl bg-[#111726] border border-white/10 space-y-4">
+                            <h3 class="text-sm font-bold text-slate-200">5-Year Revenue Projection ($ M)</h3>
+                            <div class="h-64"><canvas id="chart-growth"></canvas></div>
+                        </div>
+                        <div class="p-6 rounded-xl bg-[#111726] border border-white/10 space-y-4">
+                            <h3 class="text-sm font-bold text-slate-200">Target Acquisition Share</h3>
+                            <div class="h-64"><canvas id="chart-market"></canvas></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 2: ONBOARDING / IDEA INPUT -->
+                <section id="view-onboarding" class="app-view space-y-8 hidden">
+                    <div class="max-w-2xl mx-auto space-y-6">
+                        <div class="text-center space-y-2">
+                            <h1 class="text-3xl font-extrabold">Build Your Business Idea</h1>
+                            <p class="text-sm text-slate-400">Fill in the core parameters for the bAIzness AI engine.</p>
+                        </div>
+
+                        <form id="idea-form" onsubmit="handleFormSubmit(event)" class="p-8 rounded-2xl bg-[#111726] border border-white/10 space-y-6">
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-300">What is your business idea?</label>
+                                <textarea id="input-idea" rows="4" required class="w-full bg-slate-900 border border-white/10 rounded-xl p-4 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="e.g. Sustainable biodegradable packaging for local food delivery businesses..."></textarea>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label class="text-xs font-bold text-slate-300">Industry</label>
+                                    <select id="input-industry" class="w-full bg-slate-900 border border-white/10 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+                                        <option>CleanTech / Sustainability</option>
+                                        <option>SaaS / Software</option>
+                                        <option>E-Commerce / D2C</option>
+                                        <option>Healthcare / Biotech</option>
+                                    </select>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-xs font-bold text-slate-300">Current Stage</label>
+                                    <select id="input-stage" class="w-full bg-slate-900 border border-white/10 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+                                        <option>Just an Idea</option>
+                                        <option>Early Research</option>
+                                        <option>Prototype Built</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 font-bold text-sm text-white shadow-xl hover:shadow-indigo-500/25 transition-all">
+                                Analyze My Idea →
+                            </button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- VIEW 3: AI LOADING SCREEN -->
+                <section id="view-loading" class="app-view hidden py-20 text-center space-y-8">
+                    <div class="relative w-24 h-24 mx-auto">
+                        <div class="absolute inset-0 rounded-full bg-indigo-500/20 animate-ping"></div>
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-1 animate-spin">
+                            <div class="w-full h-full bg-[#0b0f19] rounded-full flex items-center justify-center">
+                                <i data-lucide="cpu" class="w-8 h-8 text-indigo-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <h2 class="text-2xl font-bold">Synthesizing Business Intelligence...</h2>
+                        <p id="loading-status" class="text-sm text-indigo-400 font-mono">Deconstructing market dynamics...</p>
+                    </div>
+                </section>
+
+                <!-- VIEW 4: RESULTS / SWOT -->
+                <section id="view-results" class="app-view space-y-8 hidden">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-2xl font-extrabold">Concept Evaluation Matrix</h1>
+                            <p class="text-sm text-slate-400">AI Synthesized Assessment</p>
+                        </div>
+                        <button onclick="navigateTo('dashboard')" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-xs font-bold">Open Full Dashboard</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-6 rounded-xl bg-[#111726] border border-emerald-500/20 space-y-3">
+                            <h3 class="text-sm font-bold text-emerald-400 flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Core Strengths</h3>
+                            <ul class="text-xs text-slate-300 space-y-2 list-disc pl-4">
+                                <li>Eco-friendly material compliance aligns with EU 2026 mandates.</li>
+                                <li>Low production overhead via local sourcing channels.</li>
+                            </ul>
+                        </div>
+                        <div class="p-6 rounded-xl bg-[#111726] border border-red-500/20 space-y-3">
+                            <h3 class="text-sm font-bold text-red-400 flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4"></i> Strategic Risks</h3>
+                            <ul class="text-xs text-slate-300 space-y-2 list-disc pl-4">
+                                <li>Incumbent supply chain dominance in enterprise tiers.</li>
+                                <li>Higher initial price elasticity compared to raw plastics.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 5: AI SUGGESTIONS -->
+                <section id="view-suggestions" class="app-view space-y-6 hidden">
+                    <h1 class="text-2xl font-extrabold">AI Strategic Recommendations</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-6 rounded-xl bg-[#111726] border border-white/10 space-y-4">
+                            <span class="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-[10px] font-bold uppercase">Product Positioning</span>
+                            <h3 class="text-lg font-bold">Offer Customized Subscriptions</h3>
+                            <p class="text-xs text-slate-400">Introduce monthly packaging supply kits for SMBs to guarantee recurring revenue streams.</p>
+                            <button onclick="showToast('Suggestion Applied to Roadmap', 'success')" class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold">Apply Action</button>
+                        </div>
+                        <div class="p-6 rounded-xl bg-[#111726] border border-white/10 space-y-4">
+                            <span class="px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-[10px] font-bold uppercase">Go-To-Market</span>
+                            <h3 class="text-lg font-bold">Target Local B Corp Restaurants</h3>
+                            <p class="text-xs text-slate-400">Focus initial sales outreach on sustainable food delivery providers to gain rapid market share.</p>
+                            <button onclick="showToast('Suggestion Applied to Roadmap', 'success')" class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold">Apply Action</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 6: BUSINESS PLAN -->
+                <section id="view-business-plan" class="app-view space-y-6 hidden">
+                    <div class="flex items-center justify-between">
+                        <h1 class="text-2xl font-extrabold">Generated Business Plan</h1>
+                        <button onclick="showToast('Downloading PDF Blueprint...', 'info')" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold flex items-center gap-2">
+                            <i data-lucide="download" class="w-4 h-4"></i> Export PDF
+                        </button>
+                    </div>
+
+                    <div class="p-8 rounded-2xl bg-[#111726] border border-white/10 space-y-6 font-sans">
+                        <div class="space-y-2 border-b border-white/5 pb-4">
+                            <h2 class="text-xl font-bold text-indigo-400">1. Executive Summary</h2>
+                            <p class="text-xs text-slate-300 leading-relaxed">EcoPack Solutions addresses the expanding demand for sustainable packaging in urban centers. By providing biodegradable, stylish alternative packaging solutions to local restaurants and e-commerce companies, EcoPack bridges environmental responsibility with operational efficiency.</p>
+                        </div>
+                        <div class="space-y-2 border-b border-white/5 pb-4">
+                            <h2 class="text-xl font-bold text-indigo-400">2. Financial Plan & Monetization</h2>
+                            <p class="text-xs text-slate-300 leading-relaxed">Revenue is generated via direct B2B supply orders and recurring monthly packaging subscriptions. Projected break-even occurs within 14 months of operation with an initial margin of 34%.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 7: MARKET ANALYSIS -->
+                <section id="view-market" class="app-view space-y-6 hidden">
+                    <h1 class="text-2xl font-extrabold">Market Analysis</h1>
+                    <div class="p-6 rounded-xl bg-[#111726] border border-white/10 space-y-4">
+                        <h3 class="text-base font-bold text-slate-200">Total Addressable Market (TAM)</h3>
+                        <p class="text-xs text-slate-400">The eco-packaging sector is valued at $14.2B with an expected growth rate (CAGR) of 12.4% over the next 5 years.</p>
+                    </div>
+                </section>
+
+                <!-- VIEW 8: SETTINGS -->
+                <section id="view-settings" class="app-view space-y-6 hidden">
+                    <h1 class="text-2xl font-extrabold">Settings</h1>
+                    <div class="p-6 rounded-xl bg-[#111726] border border-white/10 space-y-4 max-w-xl">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-semibold">Dark Mode Enabled</span>
+                            <input type="checkbox" checked onclick="toggleTheme()" class="w-4 h-4 accent-indigo-500">
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

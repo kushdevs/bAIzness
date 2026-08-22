@@ -1,0 +1,65 @@
+/* Base Reset & Custom Variables */
+:root {
+    --bg-primary: #0b0f19;
+    --card-bg: #111726;
+    --accent-indigo: #6366f1;
+    --accent-purple: #a855f7;
+}
+
+[data-theme="light"] {
+    --bg-primary: #f8fafc;
+    --card-bg: #ffffff;
+    --accent-indigo: #4f46e5;
+    --accent-purple: #9333ea;
+}
+
+body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.3s ease;
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Nav Item Active State */
+.nav-item.active {
+    background-color: rgba(99, 102, 241, 0.15);
+    color: #ffffff;
+    border-left: 3px solid #6366f1;
+}
+
+/* Fade In Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.app-view {
+    animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Glassmorphism Helper */
+.glass-panel {
+    background: rgba(17, 23, 38, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
